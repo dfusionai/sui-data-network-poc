@@ -125,3 +125,9 @@ export const downloadJsonFile = (file: File, filename: string) => {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
+
+export const transformFile = async (file: File) => {
+  const text = await file.text();
+  const jsonData = JSON.parse(text);
+  return jsonData;
+};

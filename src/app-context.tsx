@@ -12,7 +12,8 @@ interface ISealInfo {
   attestationObjectId: string;
   blobId: string;
   file: File | null;
-  decryptedFile: File | null;
+  refinedFileBlobId: string;
+  refinedFileOnChainObjId: string;
 }
 
 interface IAppContext {
@@ -22,7 +23,8 @@ interface IAppContext {
   updateAttestationObjectId: (attestationObjectId: string) => void;
   updateBlobId: (blobId: string) => void;
   updateFile: (file: File) => void;
-  updateDecryptedFile: (decryptedFile: File) => void;
+  updateRefinedFileBlobId: (refinedFileBlobId: string) => void;
+  updateRefinedFileOnChainObjId: (refinedFileOnChainObjId: string) => void;
   resetSealInfo: () => void;
 }
 
@@ -32,7 +34,8 @@ const initialSealInfo: ISealInfo = {
   attestationObjectId: "",
   blobId: "",
   file: null,
-  decryptedFile: null,
+  refinedFileBlobId: "",
+  refinedFileOnChainObjId: "",
 };
 
 export const AppContext = createContext<IAppContext>({
@@ -42,7 +45,8 @@ export const AppContext = createContext<IAppContext>({
   updateAttestationObjectId: missingInit,
   updateBlobId: missingInit,
   updateFile: missingInit,
-  updateDecryptedFile: missingInit,
+  updateRefinedFileBlobId: missingInit,
+  updateRefinedFileOnChainObjId: missingInit,
   resetSealInfo: missingInit,
 });
 
@@ -77,12 +81,18 @@ export const AppContextProvider = ({
     setSealInfo((prev) => ({ ...prev, file }));
   };
 
-  const updateDecryptedFile = (decryptedFile: File) => {
-    setSealInfo((prev) => ({ ...prev, decryptedFile }));
+  const resetSealInfo = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { file: _, ...rest } = initialSealInfo;
+    setSealInfo((prev) => ({ file: prev.file, ...rest }));
   };
 
-  const resetSealInfo = () => {
-    setSealInfo(initialSealInfo);
+  const updateRefinedFileBlobId = (refinedFileBlobId: string) => {
+    setSealInfo((prev) => ({ ...prev, refinedFileBlobId }));
+  };
+
+  const updateRefinedFileOnChainObjId = (refinedFileOnChainObjId: string) => {
+    setSealInfo((prev) => ({ ...prev, refinedFileOnChainObjId }));
   };
 
   return (
@@ -94,7 +104,8 @@ export const AppContextProvider = ({
         updateAttestationObjectId,
         updateBlobId,
         updateFile,
-        updateDecryptedFile,
+        updateRefinedFileBlobId,
+        updateRefinedFileOnChainObjId,
         resetSealInfo,
       }}
     >

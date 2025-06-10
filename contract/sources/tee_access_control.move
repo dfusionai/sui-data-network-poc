@@ -79,12 +79,13 @@ module seal_integration::seal_manager {
     public entry fun register_tee_attestation(
         enclave_id: vector<u8>, // Can be empty to indicate "not provided"
         blob_id: vector<u8>,
+        wallet_address: address,
         ctx: &mut TxContext
     ) {
         let attestation = TEEAttestation {
             id: object::new(ctx),
             enclave_id, // Accept empty vector as "None"
-            attested_by: tx_context::sender(ctx),
+            attested_by: wallet_address,
             blob_id,
         };
         transfer::share_object(attestation);
@@ -116,7 +117,7 @@ module seal_integration::seal_manager {
         file: &EncryptedFile,
         policy: &AccessPolicy,
         attestation: &TEEAttestation,
-        ctx: &TxContext // Use sender instead of explicit requester
+        wallet_address: address,
     ) {
         // Check if id has the correct prefix (namespace of policy)
         let namespace = namespace(policy);
@@ -127,8 +128,7 @@ module seal_integration::seal_manager {
 
         // Access control checks
         assert!(file.policy_id == object::uid_to_inner(&policy.id), EPolicyNotFound);
-        let requester = tx_context::sender(ctx);
-        assert!(vec_map::contains(&policy.rules, &requester), EAccessDenied);
+        assert!(vec_map::contains(&policy.rules, &wallet_address), EAccessDenied);
         assert!(attestation.attested_by != @0x0, EZeroAddressAttestation);
         assert!(attestation.blob_id == file.blob_id, EBlobIdMismatch);
         // No return value, aborts on failure as per SEAL SDK rule

@@ -4,4 +4,5 @@ export const CONFIG = {
   WALRUS_AGGREGATOR_URL: import.meta.env.VITE_WALRUS_AGGREGATOR_URL || "",
   WALRUS_EPOCHS: import.meta.env.VITE_WALRUS_EPOCHS || "",
   SUISCAN_URL: import.meta.env.VITE_SUISCAN_URL || "",
+  NAUTILUS_URL: import.meta.env.VITE_NAUTILUS_URL || "",
 };
