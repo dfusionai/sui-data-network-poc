@@ -8,14 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2Icon } from "lucide-react";
-import { CONFIG, downloadJsonFile } from "@/utils";
+import { Loader2Icon, Upload } from "lucide-react";
+import { CONFIG } from "@/utils";
 
 const Seal = () => {
-  const { sealInfo } = useAppContext();
-  const { onDecrypt, onEncrypt, sealingStatus, buttonStatus } = useSeal();
-  const { isDecryptButtonDisabled, isEncryptButtonDisabled, isDownloadButtonDisabled } = buttonStatus;
-
+  const { sealInfo, updateFile } = useAppContext();
+  const { onProcessData, onEncrypt, sealingStatus, buttonStatus } = useSeal();
+  const { isProcessBtnDisabled, isEncryptButtonDisabled } = buttonStatus;
+  
   return (
     <div className="container mx-auto pt-8 ">
       <Card className="bg-gray-800/50 border-gray-700 py-0 overflow-hidden gap-0">
@@ -43,15 +43,18 @@ const Seal = () => {
                 </Button>
                 <Button
                   className="bg-[#7c3aed] hover:bg-[#6d28e9]"
-                  onClick={onDecrypt}
-                  disabled={isDecryptButtonDisabled}
+                  onClick={onProcessData}
+                  disabled={isProcessBtnDisabled}
                 >
-                  {sealingStatus.isDecrypting && (
+                  {sealingStatus.isProcessing && (
                     <Loader2Icon className="animate-spin" />
                   )}{" "}
-                  Decrypt
+                  Process Data
                 </Button>
               </div>
+              <h3 className="text-purple-500 font-bold mt-5 text-lg">
+                Encryption Information
+              </h3>
               <div className="mt-4">
                 <div>
                   <strong className="text-gray-200">Policy ID:</strong>{" "}
@@ -74,6 +77,23 @@ const Seal = () => {
                   </a>
                 </div>
                 <div>
+                  <strong className="text-gray-200">
+                    On Chain Encrypted File ID:
+                  </strong>{" "}
+                  <a
+                    className="cursor-pointer"
+                    href={`${CONFIG.SUISCAN_URL}/${sealInfo?.onChainFileObjId}`}
+                    target="_blank"
+                  >
+                    {sealInfo?.onChainFileObjId || "-"}
+                  </a>
+                </div>
+              </div>
+              <h3 className="text-purple-500 font-bold mt-5 text-lg">
+                Processed Data Information
+              </h3>
+              <div className="mt-4">
+                <div>
                   <strong className="text-gray-200">Attestation ID:</strong>{" "}
                   <a
                     className="cursor-pointer"
@@ -84,24 +104,39 @@ const Seal = () => {
                   </a>
                 </div>
                 <div>
-                  <strong className="text-gray-200">Encrypted File ID:</strong>{" "}
+                  <strong className="text-gray-200">
+                    On Chain Refined File ID:
+                  </strong>{" "}
                   <a
                     className="cursor-pointer"
-                    href={`${CONFIG.SUISCAN_URL}/${sealInfo?.onChainFileObjId}`}
+                    href={`${CONFIG.SUISCAN_URL}/${sealInfo?.refinedFileOnChainObjId}`}
                     target="_blank"
                   >
-                    {sealInfo?.onChainFileObjId || "-"}
+                    {sealInfo?.refinedFileOnChainObjId || "-"}
+                  </a>
+                </div>
+                <div>
+                  <strong className="text-gray-200">
+                    Refined File Blob ID:
+                  </strong>{" "}
+                  <a
+                    className="cursor-pointer"
+                    href={`${CONFIG.WALRUS_AGGREGATOR_URL}/v1/blobs/${sealInfo?.refinedFileBlobId}`}
+                    target="_blank"
+                  >
+                    {sealInfo?.refinedFileBlobId || "-"}
                   </a>
                 </div>
               </div>
             </div>
 
-            {/* <div className="space-y-2">
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">
                 Choose file:
               </label>
               <div className="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center hover:border-purple-500 transition-colors cursor-pointer bg-gray-900/50">
                 <input
+                  accept=".json"
                   type="file"
                   id="file-upload"
                   className="hidden"
@@ -130,25 +165,23 @@ const Seal = () => {
                     )}
                   </div>
                   <div className="text-xs text-gray-500">
-                    File size must be less than 10 MiB. Only image files are
-                    allowed.
+                    only JSON files are allowed
                   </div>
                 </label>
               </div>
-            </div> */}
+            </div>
           </div>
           {/* download decrypted file */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300 mr-4">
               Download decrypted file:
             </label>
             <Button
               className="bg-[#7c3aed] hover:bg-[#6d28e9]"
-              disabled={isDownloadButtonDisabled}
               onClick={() => {
-                if (sealInfo.decryptedFile) {
+                if (sealInfo.file) {
                   downloadJsonFile(
-                    sealInfo.decryptedFile,
+                    new File([JSON.stringify(teleChatExample)], "decrypted-file.json", { type: "application/json" }),
                     "decrypted-file.json"
                   );
                 }
@@ -156,7 +189,7 @@ const Seal = () => {
             >
               Download
             </Button>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
